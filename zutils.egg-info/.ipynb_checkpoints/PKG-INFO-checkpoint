@@ -1,0 +1,6 @@
+Metadata-Version: 2.1
+Name: zutils
+Version: 0.1
+Summary: A collection of utility functions and pipelines for ZEPHIR
+Author: Richard O'Neill
+Author-email: richard.oneill1@ucdconnect.ie
