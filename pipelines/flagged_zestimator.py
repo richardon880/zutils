@@ -11,11 +11,14 @@ import pickle
 from tqdm import tqdm
 from astropy import units as u
 from astropy.coordinates import SkyCoord
-import astroFuncs as af
+import zutils.astrofuncs as af
 
-path = "/home/richard/Work/CNGFPPR/CNGFPPR/code/"
-filename = "photo_z_estimator_nan_handling.sav"  #'photo_z_estimator.sav'
-model = pickle.load(open(filename, "rb"))
+import os
+
+#'photo_z_estimator.sav'
+base_dir = os.path.abspath(os.path.dirname(__file__))
+model_path = os.path.join(base_dir, "ml_model", "photo_z_estimator_nan_handling.sav")
+model = pickle.load(open(model_path, "rb"))
 
 # bump_threshold = 0.09
 # sharpen_alpha = 1.04
@@ -117,7 +120,7 @@ def get_probable_extended_sources(df):
     to_flag = df.query("Extended == True").index.values
     to_flag_mask = np.isin(df.index, to_flag)
     df["data_flag"] = np.where(to_flag_mask, df["data_flag"] | 2**2, df["data_flag"])
-    df = df.drop(["Extended"], axis=1).reset_index(drop=True)
+    # df = df.drop(["Extended"], axis=1).reset_index(drop=True)
     return df
 
 
@@ -353,8 +356,14 @@ def square_search_ps1(ra1, ra2, dec1, dec2, table_name=None, task_name="My Query
     return ps_df
 
 
-# def circ_search_ps1
-
+def get_bounding_box(df):
+    minra = min(df.raMean)
+    maxra = max(df.raMean)
+    mindec = min(df.decMean)
+    maxdec = max(df.decMean)
+    width = maxra - minra
+    height = maxdec - mindec
+    return minra, mindec, width, height
 
 def retrieve_table(table_name):
     table = af.retrieve_table(table_name)
