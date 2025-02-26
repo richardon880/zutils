@@ -12,14 +12,17 @@ from tqdm import tqdm
 from astropy import units as u
 from astropy.coordinates import SkyCoord
 
-import astroFuncs as af
+import zutils.astrofuncs as af
 
-path = "/home/richard/Work/CNGFPPR/CNGFPPR/code/"
-filename = "photo_z_estimator_nan_handling.sav"  #'photo_z_estimator.sav'
-model = pickle.load(open(filename, "rb"))
+import os
 
-bump_threshold = 0.09
-sharpen_alpha = 1.04
+#'photo_z_estimator.sav'
+base_dir = os.path.abspath(os.path.dirname(__file__))
+model_path = os.path.join(base_dir, "ml_model", "photo_z_estimator_nan_handling.sav")
+model = pickle.load(open(model_path, "rb"))
+
+# bump_threshold = 0.09
+# sharpen_alpha = 1.04
 
 
 def drop_invalid(df):
