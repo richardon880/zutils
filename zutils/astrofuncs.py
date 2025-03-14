@@ -16,12 +16,36 @@ from urllib.parse import urlencode, quote
 from itertools import pairwise
 from PIL import Image
 from astropy import units as u
+import astropy.cosmology.units as cu
+from astropy.cosmology import Planck18
 from astropy.coordinates import SkyCoord, Angle, match_coordinates_sky
 from astropy.table import Table
 from astropy.io import fits
 from astroquery.vizier import Vizier
 
 Vizier.ROW_LIMIT = -1
+
+
+
+
+def app_to_abs_mag(distances, app_magnitudes):
+    """
+    distances: array of distances in Mpc
+    app_magnitudes: apparent kron mags
+    returns array of abs mags same len as app_magnitudes
+    """
+    # 5 - 5*np.log(distances*10e6) + magnitudes
+    abs_magnitudes = app_magnitudes - (5*np.log10(distances*1e6) - 5)
+    return abs_magnitudes
+
+def z_to_distance(redshifts)
+    """
+    redhisfts - arrray of values
+    returns array of distances in Mpc.
+    """
+    redshifts = redshifts * cu.redshift
+    distances = redshifts.to(u.Mpc, cu.redshift_distance(Planck18, kind="comoving")).value
+    return distances
 
 
 def make_ps_query(shape, ra, ra2, dec, dec2, table_name=None):
