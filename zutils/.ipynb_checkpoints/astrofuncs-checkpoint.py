@@ -38,7 +38,7 @@ def app_to_abs_mag(distances, app_magnitudes):
     abs_magnitudes = app_magnitudes - (5*np.log10(distances*1e6) - 5)
     return abs_magnitudes
 
-def z_to_distance(redshifts)
+def z_to_distance(redshifts):
     """
     redhisfts - arrray of values
     returns array of distances in Mpc.
