@@ -4,7 +4,7 @@ from tqdm import tqdm
 from sklearn import preprocessing
 from astropy import units as u
 from astropy.coordinates import SkyCoord
-import astroFuncs as af
+from zutils import astrofuncs as af
 
 
 def replace_invalid_with_nan(df):

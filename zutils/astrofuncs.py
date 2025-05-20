@@ -28,15 +28,23 @@ Vizier.ROW_LIMIT = -1
 
 
 
-def app_to_abs_mag(distances, app_magnitudes):
+def app2absmag(distances, app_magnitudes):
     """
     distances: array of distances in Mpc
     app_magnitudes: apparent kron mags
     returns array of abs mags same len as app_magnitudes
     """
-    # 5 - 5*np.log(distances*10e6) + magnitudes
     abs_magnitudes = app_magnitudes - (5*np.log10(distances*1e6) - 5)
     return abs_magnitudes
+
+def abs2appmag(distances, abs_magnitudes):
+    """
+    distances: array of distances in Mpc
+    abs_magnitudes: abs kron mags
+    returns array of app mags same len as abs_magnitudes
+    """
+    app_magnitudes = abs_magnitudes + (5*np.log10(distances*1e6) - 5)
+    return app_magnitudes
 
 def z_to_distance(redshifts):
     """
@@ -509,7 +517,7 @@ def square_query_HLEDA(ra, dec, width, height):
     df = df.rename(columns={"#$objname": "objname"}, errors="raise")
     for colname in df.columns:
         df[colname] = df[colname].str.strip()
-    df = df.replace("", np.NaN)
+    df = df.replace("", np.nan)
     df = df.drop(["b", "r", "m", "c", "t", "e_t"], axis=1)
     result = df.astype(col_dtype)
 
@@ -630,8 +638,8 @@ def square_search_tycho(ra, dec, width, height):
         co_ord, width=width, height=height, catalog=catalog, frame="icrs"
     )
     cols = [
-        "RA_ICRS_",
-        "DE_ICRS_",
+        "RA(ICRS)",
+        "DE(ICRS)",
         "pmRA",
         "pmDE",
         "BTmag",
@@ -641,6 +649,7 @@ def square_search_tycho(ra, dec, width, height):
         "TYC2",
         "TYC3",
     ]
+    # print(result[0].to_pandas().columns)
     if len(result) == 0:
         return pd.DataFrame(columns=cols)
     else:
@@ -693,7 +702,7 @@ def search_bright_stars(ra, dec, rad):
         return pd.DataFrame(columns=cols)
 
     elif len(apass) == 0:
-        bright_stars = tycho.rename(columns={"RA_ICRS_": "RA", "DE_ICRS_": "Dec"})
+        bright_stars = tycho.rename(columns={"RA(ICRS)": "RA", "DE(ICRS)": "Dec"})
         bright_stars["duplicated"] = bright_stars.duplicated(subset=["RA", "Dec"])
         dupes = bright_stars.query("duplicated == True").index
         bright_stars = bright_stars.drop(dupes)
@@ -794,7 +803,7 @@ def square_search_bright_stars(ra, dec, width, height):
         return pd.DataFrame(columns=cols)
 
     elif len(apass) == 0:
-        bright_stars = tycho.rename(columns={"RA_ICRS_": "RA", "DE_ICRS_": "Dec"})
+        bright_stars = tycho.rename(columns={"RA(ICRS)": "RA", "DE(ICRS)": "Dec"})
         bright_stars["duplicated"] = bright_stars.duplicated(subset=["RA", "Dec"])
         dupes = bright_stars.query("duplicated == True").index
         bright_stars = bright_stars.drop(dupes)
@@ -810,7 +819,7 @@ def square_search_bright_stars(ra, dec, width, height):
     else:
 
         tycho_match = SkyCoord(
-            ra=tycho.RA_ICRS_ * u.degree, dec=tycho.DE_ICRS_ * u.degree, unit=u.degree
+            ra=tycho["RA(ICRS)"] * u.degree, dec=tycho["DE(ICRS)"] * u.degree, unit=u.degree
         )
         apass_match = SkyCoord(
             ra=apass.RAJ2000 * u.degree, dec=apass.DEJ2000 * u.degree, unit=u.degree
@@ -831,13 +840,14 @@ def square_search_bright_stars(ra, dec, width, height):
 
         bright_stars = bright_stars.rename(
             columns={
-                "RA_ICRS_": "TY_RA",
-                "DE_ICRS_": "TY_DEC",
+                "RA(ICRS)": "TY_RA",
+                "DE(ICRS)": "TY_DEC",
                 "RAJ2000": "AP_RA",
                 "DEJ2000": "AP_DEC",
             }
         )
-
+        
+        # print(bright_stars.columns)
         bright_stars["RA"] = np.where(
             np.isnan(bright_stars.AP_RA), bright_stars.TY_RA, bright_stars.AP_RA
         )
