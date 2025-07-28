@@ -56,6 +56,8 @@ def z_to_distance(redshifts):
     return distances
 
 
+
+
 def make_ps_query(shape, ra, ra2, dec, dec2, table_name=None):
     query = """SELECT s.objID, s.raMean, s.decMean, s.nDetections, s.primaryDetection,
             gPSFMag, gApMag, gKronMag, gpsfChiSq, gKronRad, gExtNSigma,
