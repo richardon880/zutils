@@ -16,7 +16,7 @@ from urllib.parse import urlencode, quote
 from itertools import pairwise
 from PIL import Image
 from astropy import units as u
-import astropy.cosmology.units as cu
+import astropy.cosmology as cu
 from astropy.cosmology import Planck18
 from astropy.coordinates import SkyCoord, Angle, match_coordinates_sky
 from astropy.table import Table
@@ -24,7 +24,6 @@ from astropy.io import fits
 from astroquery.vizier import Vizier
 
 Vizier.ROW_LIMIT = -1
-
 
 
 
@@ -51,9 +50,19 @@ def z_to_distance(redshifts):
     redhisfts - arrray of values
     returns array of distances in Mpc.
     """
-    redshifts = redshifts * cu.redshift
-    distances = redshifts.to(u.Mpc, cu.redshift_distance(Planck18, kind="comoving")).value
+    redshifts = redshifts * cu.units.redshift
+    distances = redshifts.to(u.Mpc, cu.units.redshift_distance(Planck18, kind="comoving")).value
     return distances
+
+def distance_to_z(distances):
+    """
+    distances - array of floats
+    returns array of floats for redshifts relating to the distances
+    """
+    distances = distances * u.Mpc
+    redshifts = cu.z_at_value(Planck18.comoving_distance, distances).value
+    return redshifts
+
 
 
 def make_ps_query(shape, ra, ra2, dec, dec2, table_name=None):
